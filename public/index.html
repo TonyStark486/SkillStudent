@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Skill Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Student Skill Tracker</h1>
+
+<h3>Add Student</h3>
+<input id="name" placeholder="Name">
+<input id="branch" placeholder="Branch">
+<input id="skills" placeholder="Skills (comma separated)">
+<button onclick="addStudent()">Add</button>
+
+<h3>Search by Skill</h3>
+<input id="searchSkill" placeholder="Enter skill">
+<button onclick="search()">Search</button>
+
+<h3>All Students</h3>
+<button onclick="loadStudents()">Load Students</button>
+
+<ul id="list"></ul>
+
+<script>
+async function addStudent() {
+  const data = {
+    name: document.getElementById("name").value,
+    branch: document.getElementById("branch").value,
+    skills: document.getElementById("skills").value.split(",")
+  };
+
+  await fetch("/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert("Student Added");
+}
+
+async function loadStudents() {
+  const res = await fetch("/students");
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(s => {
+    list.innerHTML += `<li>${s.name} - ${s.branch} - ${s.skills}</li>`;
+  });
+}
+
+async function search() {
+  const skill = document.getElementById("searchSkill").value;
+  const res = await fetch(`/search/${skill}`);
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(s => {
+    list.innerHTML += `<li>${s.name} - ${s.skills}</li>`;
+  });
+}
+</script>
+
+</body>
+</html>
