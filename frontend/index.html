@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillTracker | Next-Gen Student Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Light Theme Gradient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #8b5cf6;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            padding: 2rem 0;
+        }
+
+        /* Left Section - Welcome */
+        .hero-left {
+            flex: 1.2;
+            animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-90px); /* Moves up by 30px */
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 50px;
+            color: #8b5cf6;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-left h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            color: #1a202c;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .description {
+            color: #4a5568;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            padding-top: 1rem;
+        }
+
+        .hero-stat {
+            flex: 1;
+        }
+
+        .hero-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #8b5cf6;
+        }
+
+        .hero-stat-label {
+            font-size: 0.75rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.3rem;
+        }
+
+        /* Right Section - Auth Box */
+        .hero-right {
+            flex: 0.9;
+            animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Separate Tab Buttons Above Auth Box */
+        .auth-tabs-outer {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-trigger {
+            padding: 0.75rem 2rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            color: #4a5568;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-trigger.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .tab-trigger:hover:not(.active) {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+            color: #8b5cf6;
+        }
+
+        /* Auth Container with Flip Animation */
+        .auth-container {
+            perspective: 1000px;
+            height: 580px;
+        }
+
+        .flip-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .login-side, .register-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            border-radius: 32px;
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-side {
+            transform: rotateY(0deg);
+        }
+
+        .register-side {
+            transform: rotateY(180deg);
+        }
+
+        .auth-form h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px 16px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            color: #1a202c;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .input-group select {
+            cursor: pointer;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: #a0aec0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-submit:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4);
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.85rem;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #742a2a;
+        }
+
+        .message.info {
+            background: #e9d8fd;
+            border: 1px solid #d6bcfa;
+            color: #44337a;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 5rem 0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* About Section */
+        .about-content {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text p {
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .about-stats {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .about-stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .about-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: #d6bcfa;
+        }
+
+        .about-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .about-stat-label {
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
+            border-color: #d6bcfa;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .feature-card h3 {
+            color: #1a202c;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .contact-info {
+            flex: 1;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .contact-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-card:hover {
+            background: #f7fafc;
+            border-color: #d6bcfa;
+            transform: translateX(5px);
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .contact-details h4 {
+            color: #1a202c;
+            margin-bottom: 0.3rem;
+        }
+
+        .contact-details p {
+            color: #718096;
+        }
+
+        .contact-form {
+            flex: 1;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            color: #1a202c;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #718096;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: #8b5cf6;
+        }
+
+        .copyright {
+            color: #a0aec0;
+            font-size: 0.85rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            background: #f7fafc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #718096;
+            border: 1px solid #e2e8f0;
+        }
+
+        .social-icon:hover {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            transform: translateY(-3px);
+            border-color: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-section {
+                flex-direction: column;
+                gap: 3rem;
+            }
+            
+            .hero-left h1 {
+                font-size: 3rem;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .contact-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="scrollToTop()">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">SkillTracker</div>
+            </div>
+            <ul class="nav-links">
+                <li><a onclick="scrollToSection('home')">Home</a></li>
+                <li><a onclick="scrollToSection('about')">About</a></li>
+                <li><a onclick="scrollToSection('features')">Features</a></li>
+                <li><a onclick="scrollToSection('contact')">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div id="home" class="hero-section">
+            <!-- Left Side - Welcome -->
+            <div class="hero-left">
+                <div class="welcome-badge">
+                    <span>✨</span> Welcome to Next-Gen Platform
+                </div>
+                <h1>
+                    Welcome to <span class="gradient-text">SkillTracker</span>
+                </h1>
+                <p class="description">
+                    Revolutionary platform for educational institutions to manage student profiles, 
+                    skills, projects, and achievements dynamically without rigid schemas.
+                </p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-number">1000+</div>
+                        <div class="hero-stat-label">Active Students</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-number">50+</div>
+                        <div class="hero-stat-label">Skills Tracked</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-number">98%</div>
+                        <div class="hero-stat-label">Satisfaction Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Auth Box with Flip Animation -->
+            <div class="hero-right">
+                <!-- Separate Tab Buttons Above -->
+                <div class="auth-tabs-outer">
+                    <button class="tab-trigger active" onclick="flipToLogin()">🔐 Teacher Login</button>
+                    <button class="tab-trigger" onclick="flipToRegister()">📝 Teacher Register</button>
+                </div>
+
+                <!-- Flip Card Container -->
+                <div class="auth-container">
+                    <div class="flip-card" id="flipCard">
+                        <div class="login-side">
+                            <div class="auth-form">
+                                <h3>Welcome Back, Teacher!</h3>
+                                <form onsubmit="handleLogin(event)">
+                                    <div class="input-group">
+                                        <input type="email" id="loginEmail" placeholder="Email address" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="password" id="loginPassword" placeholder="Password" required>
+                                    </div>
+                                    <button type="submit" class="btn-submit">Access Dashboard →</button>
+                                </form>
+                                <div id="loginMessage"></div>
+                            </div>
+                        </div>
+                        <div class="register-side">
+                            <div class="auth-form">
+                                <h3>Teacher Registration</h3>
+                                <form onsubmit="handleRegister(event)">
+                                    <div class="input-group">
+                                        <input type="text" id="regName" placeholder="Full name" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="email" id="regEmail" placeholder="Email address" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <select id="regDepartment" required>
+                                            <option value="">Select Department</option>
+                                            <option value="Computer Science">Computer Science Engineering</option>
+                                            <option value="Information Technology">Information Technology</option>
+                                            <option value="Electronics">Electronics & Communication</option>
+                                            <option value="Mechanical">Mechanical Engineering</option>
+                                            <option value="Civil">Civil Engineering</option>
+                                            <option value="Electrical">Electrical Engineering</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <select id="regDesignation" required>
+                                            <option value="">Select Designation</option>
+                                            <option value="Professor">Professor</option>
+                                            <option value="Associate Professor">Associate Professor</option>
+                                            <option value="Assistant Professor">Assistant Professor</option>
+                                            <option value="Senior Lecturer">Senior Lecturer</option>
+                                            <option value="Lecturer">Lecturer</option>
+                                            <option value="HOD">Head of Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="text" id="regEmployeeId" placeholder="Employee ID" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="password" id="regPassword" placeholder="Password (min. 6 characters)" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="password" id="regConfirmPassword" placeholder="Confirm password" required>
+                                    </div>
+                                    <button type="submit" class="btn-submit">Create Teacher Account →</button>
+                                </form>
+                                <div id="registerMessage"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div id="about" class="section">
+            <h2 class="section-title">About Us</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>SkillTracker is a revolutionary platform designed to transform how educational institutions manage student data. Built with MongoDB NoSQL database, we offer unparalleled flexibility in tracking student skills, projects, and achievements.</p>
+                    <p>Our mission is to eliminate rigid data structures and provide a dynamic, scalable solution that grows with your institution. Whether you're tracking 100 or 10,000 students, SkillTracker adapts to your needs.</p>
+                    <p>Founded in 2024, we're committed to empowering educators and students with modern technology that makes skill management effortless and insightful.</p>
+                </div>
+                <div class="about-stats">
+                    <div class="about-stat-card">
+                        <div class="about-stat-number">500+</div>
+                        <div class="about-stat-label">Institutions</div>
+                    </div>
+                    <div class="about-stat-card">
+                        <div class="about-stat-number">10K+</div>
+                        <div class="about-stat-label">Students Managed</div>
+                    </div>
+                    <div class="about-stat-card">
+                        <div class="about-stat-number">200+</div>
+                        <div class="about-stat-label">Expert Trainers</div>
+                    </div>
+                    <div class="about-stat-card">
+                        <div class="about-stat-number">24/7</div>
+                        <div class="about-stat-label">Support Available</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div id="features" class="section">
+            <h2 class="section-title">Powerful Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Dynamic Schema</h3>
+                    <p>No fixed structure - each student can have unique fields, skills, and projects without any limitations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Search</h3>
+                    <p>Find students instantly by skills, projects, achievements, or any custom field with our advanced search.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Real-time Updates</h3>
+                    <p>Instant data synchronization across all devices. Changes reflect immediately for all users.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3>JSON Storage</h3>
+                    <p>Flexible document-based data structure powered by MongoDB for maximum scalability.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Visual insights into student skill distribution, trending skills, and performance metrics.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Access</h3>
+                    <p>Role-based authentication with encrypted data storage and privacy protection.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div id="contact" class="section">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <h4>Visit Us</h4>
+                            <p>123 Tech Park, Silicon Valley, CA 94025</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-details">
+                            <h4>Email Us</h4>
+                            <p>support@skilltracker.com</p>
+                            <p>hello@skilltracker.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-details">
+                            <h4>Call Us</h4>
+                            <p>+1 (555) 123-4567</p>
+                            <p>+1 (555) 987-6543</p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-icon">⏰</div>
+                        <div class="contact-details">
+                            <h4>Working Hours</h4>
+                            <p>Mon-Fri: 9AM - 6PM</p>
+                            <p>Sat-Sun: Closed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form onsubmit="handleContact(event)">
+                        <div class="form-group">
+                            <input type="text" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Subject">
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">Send Message →</button>
+                    </form>
+                    <div id="contactMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="copyright">
+                © 2024 SkillTracker | Powered by MongoDB NoSQL
+            </div>
+            <div class="footer-links">
+                <a onclick="scrollToSection('about')">About</a>
+                <a onclick="scrollToSection('features')">Features</a>
+                <a onclick="scrollToSection('contact')">Contact</a>
+                <a>Privacy Policy</a>
+                <a>Terms of Service</a>
+            </div>
+            <div class="social-icons">
+                <div class="social-icon">📘</div>
+                <div class="social-icon">🐦</div>
+                <div class="social-icon">📷</div>
+                <div class="social-icon">💼</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/auth';
+        // Scroll to section function
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Flip functions for auth box
+        function flipToLogin() {
+            const flipCard = document.getElementById('flipCard');
+            const loginTab = document.querySelector('.tab-trigger');
+            const registerTab = document.querySelectorAll('.tab-trigger')[1];
+            
+            if (flipCard.classList.contains('flipped')) {
+                flipCard.classList.remove('flipped');
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+            }
+        }
+
+        function flipToRegister() {
+            const flipCard = document.getElementById('flipCard');
+            const loginTab = document.querySelector('.tab-trigger');
+            const registerTab = document.querySelectorAll('.tab-trigger')[1];
+            
+            if (!flipCard.classList.contains('flipped')) {
+                flipCard.classList.add('flipped');
+                loginTab.classList.remove('active');
+                registerTab.classList.add('active');
+            }
+        }
+
+        // Handle Login
+async function handleLogin(event) {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    showMessage('loginMessage', 'Authenticating...', 'info');
+    
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('loginMessage', '✅ Login successful! Redirecting...', 'success');
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('teacher', JSON.stringify(data.teacher));
+            setTimeout(() => {
+                window.location.href = 'teacher-dashboard.html';
+            }, 1500);
+        } else {
+            showMessage('loginMessage', `❌ ${data.message}`, 'error');
+        }
+    } catch (error) {
+        showMessage('loginMessage', '❌ Server error. Please try again.', 'error');
+    }
+}
+
+// Handle Registration
+async function handleRegister(event) {
+    event.preventDefault();
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const department = document.getElementById('regDepartment').value;
+    const designation = document.getElementById('regDesignation').value;
+    const employeeId = document.getElementById('regEmployeeId').value;
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+    
+    if (password !== confirmPassword) {
+        showMessage('registerMessage', '❌ Passwords do not match', 'error');
+        return;
+    }
+    
+    showMessage('registerMessage', 'Creating account...', 'info');
+    
+    try {
+        const response = await fetch(`${API_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, department, designation, employeeId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('registerMessage', '✅ Registration successful! Please login.', 'success');
+            localStorage.setItem('token', data.token);
+            
+            // Clear form
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regDepartment').value = '';
+            document.getElementById('regDesignation').value = '';
+            document.getElementById('regEmployeeId').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+            
+            // Flip to login after 2 seconds
+            setTimeout(() => {
+                flipToLogin();
+                showMessage('loginMessage', '🎉 Account created! Please login.', 'success');
+            }, 2000);
+        } else {
+            showMessage('registerMessage', `❌ ${data.message}`, 'error');
+        }
+    } catch (error) {
+        showMessage('registerMessage', '❌ Server error. Please try again.', 'error');
+    }
+}
+        // Handle Contact Form
+        function handleContact(event) {
+            event.preventDefault();
+            showMessage('contactMessage', '✅ Message sent successfully! We\'ll get back to you soon.', 'success');
+            event.target.reset();
+            setTimeout(() => {
+                document.getElementById('contactMessage').innerHTML = '';
+            }, 3000);
+        }
+
+        // Show message function
+        function showMessage(elementId, message, type) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                if (messageDiv.innerHTML.includes(message)) {
+                    messageDiv.innerHTML = '';
+                }
+            }, 3000);
+        }
+
+        // Check if teacher is logged in
+        window.addEventListener('load', () => {
+            const currentTeacher = localStorage.getItem('currentTeacher');
+            if (currentTeacher) {
+                console.log('Logged in as teacher:', JSON.parse(currentTeacher).name);
+            }
+        });
+    </script>
+</body>
+</html>
