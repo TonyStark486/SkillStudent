@@ -3,17 +3,35 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// CORS configuration for frontend
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5500', // Your frontend URL
+// ===== CORS CONFIGURATION =====
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://localhost:3000',
+  'https://skilltracker-nine.vercel.app',
+  'https://skillstudent.onrender.com'
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
-  optionsSuccessStatus: 200
-};
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+}));
+
+app.options('*', cors());
 
 // Middleware
 app.use(cors(corsOptions));
