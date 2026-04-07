@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/view",
+      "dest": "/view.html"
+    },
+    {
+      "src": "/search",
+      "dest": "/search.html"
+    },
+    {
+      "src": "/teacher-dashboard",
+      "dest": "/teacher-dashboard.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1.html"
+    }
+  ]
+}
