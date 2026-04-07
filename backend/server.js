@@ -7,44 +7,29 @@ dotenv.config();
 
 const app = express();
 
-// ===== CORS CONFIGURATION =====
-const allowedOrigins = [
-  'http://localhost:5500',
-  'http://localhost:3000',
-  'https://skilltracker-nine.vercel.app',
-  'https://skillstudent.onrender.com'
-];
-
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
-}));
-
+// ===== SIMPLE CORS FIX (Recommended) =====
+// This allows all origins - perfect for your use case
+app.use(cors());
 app.options('*', cors());
 
-// Middleware
+// ===== OR if you want specific origins only, use this instead =====
+/*
+const corsOptions = {
+  origin: ['http://localhost:5500', 'https://skilltracker-nine.vercel.app'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 app.use(cors(corsOptions));
+*/
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB Connected Successfully');
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error.message);
