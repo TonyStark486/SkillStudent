@@ -12,16 +12,13 @@ const app = express();
 app.use(cors());
 app.options('*', cors());
 
-// ===== OR if you want specific origins only, use this instead =====
-/*
-const corsOptions = {
-  origin: ['http://localhost:5500', 'https://skilltracker-nine.vercel.app'],
+// CORS configuration
+app.use(cors({
+  origin: ['http://localhost:5500', 'https://skilltracker-nine.vercel.app', 'https://skillstudent.onrender.com'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-};
-app.use(cors(corsOptions));
-*/
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +38,7 @@ connectDB();
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/students', require('./routes/studentRoutes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -57,10 +55,21 @@ app.get('/', (req, res) => {
     success: true,
     message: '🎓 SkillTracker API is running',
     endpoints: {
-      register: 'POST /api/auth/register',
-      login: 'POST /api/auth/login',
-      verify: 'GET /api/auth/verify',
-      health: 'GET /health'
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        verify: 'GET /api/auth/verify'
+      },
+      students: {
+        add: 'POST /api/students/add',
+        getAll: 'GET /api/students',
+        getById: 'GET /api/students/:id',
+        update: 'PUT /api/students/:id',
+        delete: 'DELETE /api/students/:id',
+        addSkill: 'POST /api/students/:id/skills',
+        removeSkill: 'DELETE /api/students/:id/skills/:skill',
+        searchBySkill: 'GET /api/students/search/:skill'
+      }
     }
   });
 });
