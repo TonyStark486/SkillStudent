@@ -9,6 +9,15 @@ router.post('/add', protect, async (req, res) => {
   try {
     const { name, email, rollNumber, branch, semester, skills, projects, achievements, cgpa, attendance } = req.body;
     
+    // Validate required fields
+    if (!name || !email || !rollNumber || !branch) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Name, email, roll number, and branch are required' 
+      });
+    }
+    
+    // Check if student already exists
     const existingStudent = await Student.findOne({ $or: [{ email }, { rollNumber }] });
     if (existingStudent) {
       return res.status(400).json({ 
@@ -17,6 +26,7 @@ router.post('/add', protect, async (req, res) => {
       });
     }
     
+    // Create student
     const student = await Student.create({
       name,
       email,
@@ -31,7 +41,13 @@ router.post('/add', protect, async (req, res) => {
       addedBy: req.teacher._id
     });
     
-    await req.teacher.students.push(student._id);
+    // ✅ FIX: Initialize students array if it doesn't exist
+    if (!req.teacher.students) {
+      req.teacher.students = [];
+    }
+    
+    // Add student to teacher's students array
+    req.teacher.students.push(student._id);
     await req.teacher.save();
     
     res.status(201).json({
@@ -40,8 +56,11 @@ router.post('/add', protect, async (req, res) => {
       student
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error adding student:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while adding student'
+    });
   }
 });
 
@@ -53,7 +72,7 @@ router.get('/', protect, async (req, res) => {
     let query = { addedBy: req.teacher._id };
     
     if (branch) query.branch = branch;
-    if (semester) query.semester = semester;
+    if (semester) query.semester = parseInt(semester);
     if (skill) query.skills = { $in: [skill] };
     
     const students = await Student.find(query).sort({ createdAt: -1 });
@@ -64,7 +83,11 @@ router.get('/', protect, async (req, res) => {
       students
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error fetching students:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while fetching students'
+    });
   }
 });
 
@@ -78,12 +101,22 @@ router.get('/:id', protect, async (req, res) => {
     });
     
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Student not found' 
+      });
     }
     
-    res.status(200).json({ success: true, student });
+    res.status(200).json({ 
+      success: true, 
+      student 
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error fetching student:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while fetching student'
+    });
   }
 });
 
@@ -97,7 +130,10 @@ router.put('/:id', protect, async (req, res) => {
     });
     
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Student not found' 
+      });
     }
     
     const { name, email, rollNumber, branch, semester, skills, projects, achievements, cgpa, attendance } = req.body;
@@ -122,7 +158,11 @@ router.put('/:id', protect, async (req, res) => {
       student
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error updating student:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while updating student'
+    });
   }
 });
 
@@ -136,18 +176,28 @@ router.delete('/:id', protect, async (req, res) => {
     });
     
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Student not found' 
+      });
     }
     
-    await req.teacher.students.pull(student._id);
-    await req.teacher.save();
+    // ✅ FIX: Check if students array exists before pulling
+    if (req.teacher.students) {
+      req.teacher.students = req.teacher.students.filter(id => id.toString() !== student._id.toString());
+      await req.teacher.save();
+    }
     
     res.status(200).json({
       success: true,
       message: 'Student deleted successfully'
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error deleting student:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while deleting student'
+    });
   }
 });
 
@@ -158,7 +208,10 @@ router.post('/:id/skills', protect, async (req, res) => {
     const { skill } = req.body;
     
     if (!skill) {
-      return res.status(400).json({ success: false, message: 'Skill is required' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Skill is required' 
+      });
     }
     
     const student = await Student.findOne({ 
@@ -167,11 +220,17 @@ router.post('/:id/skills', protect, async (req, res) => {
     });
     
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Student not found' 
+      });
     }
     
     if (student.skills.includes(skill)) {
-      return res.status(400).json({ success: false, message: 'Skill already exists' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Skill already exists' 
+      });
     }
     
     student.skills.push(skill);
@@ -184,7 +243,11 @@ router.post('/:id/skills', protect, async (req, res) => {
       student
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error adding skill:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while adding skill'
+    });
   }
 });
 
@@ -198,7 +261,10 @@ router.delete('/:id/skills/:skill', protect, async (req, res) => {
     });
     
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Student not found' 
+      });
     }
     
     student.skills = student.skills.filter(s => s !== req.params.skill);
@@ -211,7 +277,11 @@ router.delete('/:id/skills/:skill', protect, async (req, res) => {
       student
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error removing skill:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while removing skill'
+    });
   }
 });
 
@@ -231,37 +301,11 @@ router.get('/search/:skill', protect, async (req, res) => {
       students
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// @route   GET /api/students/stats/summary
-// @desc    Get statistics for teacher dashboard
-router.get('/stats/summary', protect, async (req, res) => {
-  try {
-    const students = await Student.find({ addedBy: req.teacher._id });
-    
-    let totalSkills = 0;
-    let totalProjects = 0;
-    let totalAchievements = 0;
-    
-    students.forEach(s => {
-      totalSkills += s.skills?.length || 0;
-      totalProjects += s.projects?.length || 0;
-      totalAchievements += s.achievements?.length || 0;
+    console.error('Error searching students:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Server error while searching students'
     });
-    
-    res.status(200).json({
-      success: true,
-      stats: {
-        totalStudents: students.length,
-        totalSkills,
-        totalProjects,
-        totalAchievements
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
   }
 });
 

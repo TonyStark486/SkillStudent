@@ -42,13 +42,18 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     default: 'teacher'
   },
+  students: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
+    default: []  // ← ADD THIS DEFAULT VALUE
+  }],
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-// Encrypt password using bcrypt
+// Encrypt password
 teacherSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
     next();
@@ -57,7 +62,7 @@ teacherSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Match user entered password to hashed password in database
+// Match password
 teacherSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
