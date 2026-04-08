@@ -171,6 +171,7 @@
             border-radius: 20px;
             padding: 1.5rem;
             transition: all 0.3s ease;
+            text-align: center;
         }
 
         .stat-card:hover {
@@ -208,6 +209,9 @@
             font-weight: 600;
             margin-bottom: 1.5rem;
             color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Forms */
@@ -285,6 +289,21 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #feb2b2;
+        }
+
+        .btn-success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
         /* Students Table */
@@ -323,9 +342,20 @@
             margin: 2px;
         }
 
+        .project-badge, .achievement-badge {
+            background: #e9d8fd;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin: 2px;
+            color: #44337a;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         /* Search Box */
@@ -375,7 +405,7 @@
             }
         }
 
-        /* Modal - Fixed */
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -393,11 +423,10 @@
             background: white;
             border-radius: 20px;
             padding: 2rem;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
-            position: relative;
             animation: modalSlideIn 0.3s ease;
             box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
         }
@@ -425,6 +454,19 @@
             margin-top: 1.5rem;
         }
 
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .remove-skill {
+            cursor: pointer;
+            margin-left: 4px;
+            color: #e53e3e;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -448,6 +490,10 @@
             
             .nav-btn {
                 justify-content: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -499,7 +545,7 @@
             <div id="dashboardPanel">
                 <div class="main-header">
                     <h1 class="header-title">Teacher Dashboard</h1>
-                    <p class="header-subtitle">Welcome back! Here's your teaching overview</p>
+                    <p class="header-subtitle">Track student skills, projects, and achievements</p>
                 </div>
 
                 <div class="stats-grid" id="statsGrid">
@@ -530,7 +576,7 @@
                     <div class="students-table-container">
                         <table class="students-table">
                             <thead>
-                                <tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Skills</th><th>Actions</th></tr>
+                                <tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Skills</th><th>Projects</th><th>Achievements</th><th>Actions</th></tr>
                             </thead>
                             <tbody id="recentStudentsList"></tbody>
                         </table>
@@ -560,12 +606,12 @@
                             <div class="form-group">
                                 <label>Branch *</label>
                                 <select id="branch">
-                                    <option value="CSE">CSE</option>
-                                    <option value="IT">IT</option>
-                                    <option value="ECE">ECE</option>
-                                    <option value="MECH">MECH</option>
-                                    <option value="CIVIL">CIVIL</option>
-                                    <option value="EEE">EEE</option>
+                                    <option value="CSE">Computer Science (CSE)</option>
+                                    <option value="IT">Information Technology (IT)</option>
+                                    <option value="ECE">Electronics (ECE)</option>
+                                    <option value="MECH">Mechanical (MECH)</option>
+                                    <option value="CIVIL">Civil</option>
+                                    <option value="EEE">Electrical (EEE)</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -573,18 +619,27 @@
                                 <input type="number" id="semester" min="1" max="8" value="1">
                             </div>
                             <div class="form-group">
-                                <label>Section</label>
-                                <input type="text" id="section" placeholder="A/B/C">
-                            </div>
-                            <div class="form-group">
-                                <label>Skills (comma separated)</label>
-                                <input type="text" id="skills" placeholder="Python, Java, MongoDB">
-                            </div>
-                            <div class="form-group">
                                 <label>CGPA</label>
                                 <input type="number" id="cgpa" step="0.01" min="0" max="10" value="0">
                             </div>
                         </div>
+                        
+                        <div class="form-group">
+                            <label>Skills (comma separated)</label>
+                            <input type="text" id="skills" placeholder="Python, Java, MongoDB, React">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Projects (format: Title:Tech:Description)</label>
+                            <input type="text" id="projects" placeholder="Ecommerce App:React,Node:MERN project, Chatbot:Python:AI project">
+                            <small style="color: #718096;">Separate multiple projects with comma. Format: Title:Technology:Description</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Achievements (comma separated)</label>
+                            <input type="text" id="achievements" placeholder="Hackathon Winner, Best Project Award, Gold Medal">
+                        </div>
+                        
                         <button type="submit" class="btn-primary">Add Student</button>
                     </form>
                 </div>
@@ -598,7 +653,7 @@
                     <div class="students-table-container">
                         <table class="students-table">
                             <thead>
-                                <tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Semester</th><th>Skills</th><th>Actions</th></tr>
+                                <tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Sem</th><th>Skills</th><th>Projects</th><th>Achievements</th><th>Actions</th></tr>
                             </thead>
                             <tbody id="allStudentsList"></tbody>
                         </table>
@@ -611,7 +666,7 @@
                 <div class="content-panel">
                     <h3 class="panel-title">🔍 Search Students by Skill</h3>
                     <div class="search-box">
-                        <input type="text" id="searchSkill" placeholder="Enter skill (e.g., Python, Java)">
+                        <input type="text" id="searchSkill" placeholder="Enter skill (e.g., Python, Java, MongoDB)">
                         <button class="btn-primary" onclick="searchBySkill()">Search</button>
                     </div>
                     <div id="searchResults"></div>
@@ -620,7 +675,7 @@
         </div>
     </div>
 
-    <!-- Modal will be dynamically inserted here -->
+    <!-- Modal Root -->
     <div id="modalRoot"></div>
 
     <script>
@@ -628,7 +683,7 @@
         let currentTeacher = null;
         let token = null;
 
-        // Check authentication - Dashboard opens directly
+        // Check authentication
         window.addEventListener('load', () => {
             token = localStorage.getItem('token');
             currentTeacher = JSON.parse(localStorage.getItem('teacher'));
@@ -646,8 +701,6 @@
             document.getElementById('teacherName').textContent = currentTeacher.name;
             document.getElementById('teacherEmail').textContent = currentTeacher.email;
             document.getElementById('teacherDept').textContent = currentTeacher.department;
-            
-            // Set profile initial
             const firstLetter = currentTeacher.name.charAt(0).toUpperCase();
             document.getElementById('profilePic').textContent = firstLetter;
         }
@@ -663,7 +716,6 @@
                     const students = data.students;
                     document.getElementById('totalStudents').textContent = students.length;
                     
-                    // Calculate stats
                     let totalSkills = 0;
                     let totalProjects = 0;
                     let totalAchievements = 0;
@@ -678,7 +730,6 @@
                     document.getElementById('totalProjects').textContent = totalProjects;
                     document.getElementById('totalAchievements').textContent = totalAchievements;
                     
-                    // Show recent 5 students
                     const recentStudents = students.slice(0, 5);
                     displayRecentStudents(recentStudents);
                 }
@@ -690,7 +741,7 @@
         function displayRecentStudents(students) {
             const tbody = document.getElementById('recentStudentsList');
             if (students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No students found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No students found</td></tr>';
                 return;
             }
             
@@ -700,6 +751,8 @@
                     <td>${s.rollNumber || '-'}</td>
                     <td>${s.branch}</td>
                     <td>${s.skills?.slice(0, 2).map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                    <td>${s.projects?.slice(0, 1).map(p => `<span class="project-badge">${p.title}</span>`).join('') || '-'}</td>
+                    <td>${s.achievements?.slice(0, 1).map(a => `<span class="achievement-badge">${a.title}</span>`).join('') || '-'}</td>
                     <td class="action-buttons">
                         <button class="btn-secondary" onclick="openEditModal('${s._id}')">Edit</button>
                         <button class="btn-danger" onclick="deleteStudent('${s._id}')">Delete</button>
@@ -718,7 +771,7 @@
                 if (data.success) {
                     const tbody = document.getElementById('allStudentsList');
                     if (data.students.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No students found</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">No students found</td></tr>';
                         return;
                     }
                     
@@ -728,130 +781,18 @@
                             <td>${s.rollNumber || '-'}</td>
                             <td>${s.branch}</td>
                             <td>${s.semester || '-'}</td>
-                            <td>${s.skills?.slice(0, 2).map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                            <td>${s.skills?.map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                            <td>${s.projects?.map(p => `<span class="project-badge">${p.title}</span>`).join('') || '-'}</td>
+                            <td>${s.achievements?.map(a => `<span class="achievement-badge">${a.title}</span>`).join('') || '-'}</td>
                             <td class="action-buttons">
                                 <button class="btn-secondary" onclick="openEditModal('${s._id}')">Edit</button>
                                 <button class="btn-danger" onclick="deleteStudent('${s._id}')">Delete</button>
-                            </td>
+                             </td>
                         </tr>
                     `).join('');
                 }
             } catch (error) {
                 console.error('Error loading students:', error);
-            }
-        }
-
-        // Open Edit Modal - Fixed
-        function openEditModal(id) {
-            // Fetch student data
-            fetch(`${API_URL}/students/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const student = data.student;
-                    showModal(id, student);
-                }
-            })
-            .catch(error => {
-                showMessage('allStudentsMessage', 'Error loading student data', 'error');
-            });
-        }
-
-        // Show Modal Function
-        function showModal(id, student) {
-            const modalHTML = `
-                <div class="modal-overlay" id="editModalOverlay">
-                    <div class="modal-container">
-                        <h3>✏️ Edit Student</h3>
-                        <form id="editStudentForm">
-                            <input type="hidden" id="editStudentId" value="${id}">
-                            <div class="form-group">
-                                <label>Name *</label>
-                                <input type="text" id="editName" value="${student.name.replace(/"/g, '&quot;')}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" id="editEmail" value="${student.email}" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Skills (comma separated)</label>
-                                <input type="text" id="editSkills" value="${student.skills?.join(', ') || ''}" placeholder="Python, Java, MongoDB">
-                            </div>
-                            <div class="form-group">
-                                <label>Add New Skill</label>
-                                <input type="text" id="newSkill" placeholder="Enter skill to add">
-                            </div>
-                            <div class="modal-buttons">
-                                <button type="submit" class="btn-primary">💾 Update Student</button>
-                                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('modalRoot').innerHTML = modalHTML;
-            
-            // Add event listener to the form
-            document.getElementById('editStudentForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                updateStudent(id);
-            });
-        }
-
-        // Close Modal - Fixed
-        function closeModal() {
-            const overlay = document.getElementById('editModalOverlay');
-            if (overlay) {
-                overlay.remove();
-            }
-        }
-
-        // Update Student
-        async function updateStudent(id) {
-            const newSkill = document.getElementById('newSkill').value.trim();
-            
-            let updateData = {
-                name: document.getElementById('editName').value,
-                email: document.getElementById('editEmail').value
-            };
-            
-            const skillsInput = document.getElementById('editSkills').value;
-            if (skillsInput) {
-                updateData.skills = skillsInput.split(',').map(s => s.trim());
-            }
-            
-            try {
-                // Update student info
-                let response = await fetch(`${API_URL}/students/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(updateData)
-                });
-                
-                // Add new skill if provided
-                if (newSkill) {
-                    response = await fetch(`${API_URL}/students/${id}/skills`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ skill: newSkill })
-                    });
-                }
-                
-                closeModal();
-                loadDashboardData();
-                loadAllStudents();
-                showMessage('allStudentsMessage', '✅ Student updated successfully!', 'success');
-            } catch (error) {
-                showMessage('allStudentsMessage', 'Error updating student', 'error');
             }
         }
 
@@ -861,14 +802,35 @@
             
             const skills = document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s);
             
+            // Parse projects
+            const projectsInput = document.getElementById('projects').value;
+            let projects = [];
+            if (projectsInput) {
+                projects = projectsInput.split(',').map(p => {
+                    const parts = p.split(':');
+                    return {
+                        title: parts[0]?.trim() || '',
+                        tech: parts[1]?.split(',').map(t => t.trim()) || [],
+                        description: parts[2]?.trim() || ''
+                    };
+                }).filter(p => p.title);
+            }
+            
+            const achievements = document.getElementById('achievements').value.split(',').map(a => ({ 
+                title: a.trim(), 
+                date: new Date(), 
+                description: '' 
+            })).filter(a => a.title);
+            
             const studentData = {
                 name: document.getElementById('studentName').value,
                 email: document.getElementById('studentEmail').value,
                 rollNumber: document.getElementById('rollNumber').value,
                 branch: document.getElementById('branch').value,
                 semester: parseInt(document.getElementById('semester').value) || 1,
-                section: document.getElementById('section').value,
                 skills: skills,
+                projects: projects,
+                achievements: achievements,
                 cgpa: parseFloat(document.getElementById('cgpa').value) || 0
             };
             
@@ -897,9 +859,179 @@
             }
         });
 
+        // Open Edit Modal
+        function openEditModal(id) {
+            fetch(`${API_URL}/students/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showEditModal(id, data.student);
+                }
+            })
+            .catch(error => {
+                showMessage('allStudentsMessage', 'Error loading student data', 'error');
+            });
+        }
+
+        function showEditModal(id, student) {
+            const skillsList = student.skills?.map(s => `<span class="skill-badge">${s} <span class="remove-skill" onclick="removeSkill('${id}', '${s}')">✖</span></span>`).join('') || 'No skills';
+            
+            const modalHTML = `
+                <div class="modal-overlay" id="editModalOverlay">
+                    <div class="modal-container">
+                        <h3>✏️ Edit Student: ${student.name}</h3>
+                        <form id="editStudentForm">
+                            <input type="hidden" id="editStudentId" value="${id}">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="editName" value="${student.name.replace(/"/g, '&quot;')}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="editEmail" value="${student.email}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Roll Number</label>
+                                <input type="text" id="editRollNumber" value="${student.rollNumber || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>Branch</label>
+                                <select id="editBranch">
+                                    <option value="CSE" ${student.branch === 'CSE' ? 'selected' : ''}>CSE</option>
+                                    <option value="IT" ${student.branch === 'IT' ? 'selected' : ''}>IT</option>
+                                    <option value="ECE" ${student.branch === 'ECE' ? 'selected' : ''}>ECE</option>
+                                    <option value="MECH" ${student.branch === 'MECH' ? 'selected' : ''}>MECH</option>
+                                    <option value="CIVIL" ${student.branch === 'CIVIL' ? 'selected' : ''}>CIVIL</option>
+                                    <option value="EEE" ${student.branch === 'EEE' ? 'selected' : ''}>EEE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Semester</label>
+                                <input type="number" id="editSemester" value="${student.semester || 1}" min="1" max="8">
+                            </div>
+                            <div class="form-group">
+                                <label>CGPA</label>
+                                <input type="number" id="editCgpa" value="${student.cgpa || 0}" step="0.01" min="0" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label>Current Skills</label>
+                                <div class="skill-list" id="skillsList">${skillsList}</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Add New Skill</label>
+                                <input type="text" id="newSkill" placeholder="Enter skill to add">
+                            </div>
+                            <div class="form-group">
+                                <label>Projects (format: Title:Technology:Description)</label>
+                                <input type="text" id="editProjects" value="${student.projects?.map(p => `${p.title}:${p.tech?.join(',')}:${p.description || ''}`).join(', ') || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>Achievements (comma separated)</label>
+                                <input type="text" id="editAchievements" value="${student.achievements?.map(a => a.title).join(', ') || ''}">
+                            </div>
+                            <div class="modal-buttons">
+                                <button type="submit" class="btn-primary">💾 Update Student</button>
+                                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalRoot').innerHTML = modalHTML;
+            document.getElementById('editStudentForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateStudent(id);
+            });
+        }
+
+        async function removeSkill(studentId, skillName) {
+            try {
+                const response = await fetch(`${API_URL}/students/${studentId}/skills/${encodeURIComponent(skillName)}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    loadDashboardData();
+                    loadAllStudents();
+                    showMessage('allStudentsMessage', '✅ Skill removed successfully!', 'success');
+                }
+            } catch (error) {
+                showMessage('allStudentsMessage', 'Error removing skill', 'error');
+            }
+        }
+
+        async function updateStudent(id) {
+            const newSkill = document.getElementById('newSkill').value.trim();
+            
+            // Parse projects
+            const projectsInput = document.getElementById('editProjects').value;
+            let projects = [];
+            if (projectsInput) {
+                projects = projectsInput.split(',').map(p => {
+                    const parts = p.split(':');
+                    return {
+                        title: parts[0]?.trim() || '',
+                        tech: parts[1]?.split(',').map(t => t.trim()) || [],
+                        description: parts[2]?.trim() || ''
+                    };
+                }).filter(p => p.title);
+            }
+            
+            const achievements = document.getElementById('editAchievements').value.split(',').map(a => ({ 
+                title: a.trim(), 
+                date: new Date(), 
+                description: '' 
+            })).filter(a => a.title);
+            
+            const updateData = {
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                rollNumber: document.getElementById('editRollNumber').value,
+                branch: document.getElementById('editBranch').value,
+                semester: parseInt(document.getElementById('editSemester').value),
+                cgpa: parseFloat(document.getElementById('editCgpa').value),
+                projects: projects,
+                achievements: achievements
+            };
+            
+            try {
+                let response = await fetch(`${API_URL}/students/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (newSkill) {
+                    response = await fetch(`${API_URL}/students/${id}/skills`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ skill: newSkill })
+                    });
+                }
+                
+                closeModal();
+                loadDashboardData();
+                loadAllStudents();
+                showMessage('allStudentsMessage', '✅ Student updated successfully!', 'success');
+            } catch (error) {
+                showMessage('allStudentsMessage', 'Error updating student', 'error');
+            }
+        }
+
         // Delete Student
         async function deleteStudent(id) {
-            if (confirm('Are you sure you want to delete this student?')) {
+            if (confirm('Are you sure you want to delete this student? This will remove all their skills, projects, and achievements.')) {
                 try {
                     const response = await fetch(`${API_URL}/students/${id}`, {
                         method: 'DELETE',
@@ -939,7 +1071,7 @@
                         <h4>Found ${data.count} student(s) with skill "${skill}":</h4>
                         <div class="students-table-container">
                             <table class="students-table">
-                                <thead><tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Skills</th></tr></thead>
+                                <thead><tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Skills</th><th>Projects</th><th>Achievements</th></tr></thead>
                                 <tbody>
                                     ${data.students.map(s => `
                                         <tr>
@@ -947,6 +1079,8 @@
                                             <td>${s.rollNumber || '-'}</td>
                                             <td>${s.branch}</td>
                                             <td>${s.skills?.map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                                            <td>${s.projects?.slice(0, 2).map(p => `<span class="project-badge">${p.title}</span>`).join('') || '-'}</td>
+                                            <td>${s.achievements?.slice(0, 2).map(a => `<span class="achievement-badge">${a.title}</span>`).join('') || '-'}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -961,7 +1095,11 @@
             }
         }
 
-        // UI Functions
+        function closeModal() {
+            const overlay = document.getElementById('editModalOverlay');
+            if (overlay) overlay.remove();
+        }
+
         function showPanel(panel) {
             document.getElementById('dashboardPanel').classList.add('hidden');
             document.getElementById('addStudentPanel').classList.add('hidden');
@@ -970,7 +1108,6 @@
             
             document.getElementById(`${panel}Panel`).classList.remove('hidden');
             
-            // Update active nav button
             const buttons = document.querySelectorAll('.nav-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             if (event && event.target) {
@@ -978,23 +1115,15 @@
                 if (clickedBtn) clickedBtn.classList.add('active');
             }
             
-            if (panel === 'allStudents') {
-                loadAllStudents();
-            }
+            if (panel === 'allStudents') loadAllStudents();
         }
         
         function showMessage(elementId, message, type) {
             const msgDiv = document.getElementById(elementId);
             if (msgDiv) {
                 msgDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
-                setTimeout(() => {
-                    if (msgDiv.innerHTML.includes(message)) {
-                        msgDiv.innerHTML = '';
-                    }
-                }, 3000);
-            } else {
-                alert(message);
-            }
+                setTimeout(() => { if (msgDiv.innerHTML.includes(message)) msgDiv.innerHTML = ''; }, 3000);
+            } else { alert(message); }
         }
         
         function logout() {
@@ -1003,12 +1132,9 @@
             window.location.href = 'index.html';
         }
 
-        // Close modal when clicking outside
         document.addEventListener('click', function(event) {
             const overlay = document.getElementById('editModalOverlay');
-            if (event.target === overlay) {
-                closeModal();
-            }
+            if (event.target === overlay) closeModal();
         });
     </script>
 </body>
