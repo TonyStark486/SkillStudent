@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard | SkillTracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .teacher-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.25rem;
+        }
+
+        .teacher-email {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .teacher-dept {
+            font-size: 0.8rem;
+            color: #8b5cf6;
+            margin-top: 0.25rem;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: #4a5568;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn:hover {
+            background: #f7fafc;
+            color: #8b5cf6;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            color: #8b5cf6;
+            border-left: 3px solid #8b5cf6;
+        }
+
+        .logout-btn {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .logout-btn .nav-btn {
+            color: #e53e3e;
+        }
+
+        .logout-btn .nav-btn:hover {
+            background: #fff5f5;
+            color: #e53e3e;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .main-header {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .header-subtitle {
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #8b5cf6;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        /* Content Panels */
+        .content-panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #1a202c;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            color: #1a202c;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger {
+            background: #fed7d7;
+            color: #e53e3e;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Students Table */
+        .students-table-container {
+            overflow-x: auto;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .students-table th,
+        .students-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .students-table th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .students-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .skill-badge {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Search Box */
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 1rem;
+            }
+            
+            .sidebar-header h3, .sidebar-header p, .teacher-dept, .nav-btn span:last-child {
+                display: none;
+            }
+            
+            .profile-pic {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .nav-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="profile-pic" id="profilePic">👨‍🏫</div>
+                <div class="teacher-name" id="teacherName">Loading...</div>
+                <div class="teacher-email" id="teacherEmail">Loading...</div>
+                <div class="teacher-dept" id="teacherDept">Loading...</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <button class="nav-btn active" onclick="showPanel('dashboard')">
+                        <span>📊</span> <span>Dashboard</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" onclick="showPanel('addStudent')">
+                        <span>➕</span> <span>Add Student</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" onclick="showPanel('allStudents')">
+                        <span>📋</span> <span>All Students</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-btn" onclick="showPanel('searchStudent')">
+                        <span>🔍</span> <span>Search by Skill</span>
+                    </button>
+                </li>
+            </ul>
+
+            <div class="logout-btn">
+                <button class="nav-btn" onclick="logout()">
+                    <span>🚪</span> <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Panel -->
+            <div id="dashboardPanel">
+                <div class="main-header">
+                    <h1 class="header-title">Teacher Dashboard</h1>
+                    <p class="header-subtitle">Welcome back! Here's your teaching overview</p>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👨‍🎓</div>
+                        <div class="stat-number" id="totalStudents">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💡</div>
+                        <div class="stat-number" id="totalSkills">0</div>
+                        <div class="stat-label">Skills Tracked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-number" id="totalProjects">0</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-number" id="totalAchievements">0</div>
+                        <div class="stat-label">Achievements</div>
+                    </div>
+                </div>
+
+                <div class="content-panel">
+                    <h3 class="panel-title">📋 Recent Students</h3>
+                    <div class="students-table-container">
+                        <table class="students-table" id="recentStudentsTable">
+                            <thead>
+                                <tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Skills</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="recentStudentsList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Student Panel -->
+            <div id="addStudentPanel" class="hidden">
+                <div class="content-panel">
+                    <h3 class="panel-title">➕ Add New Student</h3>
+                    <form id="addStudentForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="studentName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="studentEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Roll Number *</label>
+                                <input type="text" id="rollNumber" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Branch *</label>
+                                <select id="branch">
+                                    <option value="CSE">CSE</option>
+                                    <option value="IT">IT</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="EEE">EEE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Semester</label>
+                                <input type="number" id="semester" min="1" max="8">
+                            </div>
+                            <div class="form-group">
+                                <label>Section</label>
+                                <input type="text" id="section" placeholder="A/B/C">
+                            </div>
+                            <div class="form-group">
+                                <label>Skills (comma separated)</label>
+                                <input type="text" id="skills" placeholder="Python, Java, MongoDB">
+                            </div>
+                            <div class="form-group">
+                                <label>CGPA</label>
+                                <input type="number" id="cgpa" step="0.01" min="0" max="10">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Add Student</button>
+                    </form>
+                    <div id="addStudentMessage"></div>
+                </div>
+            </div>
+
+            <!-- All Students Panel -->
+            <div id="allStudentsPanel" class="hidden">
+                <div class="content-panel">
+                    <h3 class="panel-title">📋 All Students</h3>
+                    <div class="students-table-container">
+                        <table class="students-table">
+                            <thead>
+                                <tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Semester</th><th>Skills</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="allStudentsList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Student Panel -->
+            <div id="searchStudentPanel" class="hidden">
+                <div class="content-panel">
+                    <h3 class="panel-title">🔍 Search Students by Skill</h3>
+                    <div class="search-box">
+                        <input type="text" id="searchSkill" placeholder="Enter skill (e.g., Python, Java)">
+                        <button class="btn-primary" onclick="searchBySkill()">Search</button>
+                    </div>
+                    <div id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Edit Student</h3>
+            <form id="editForm">
+                <input type="hidden" id="editStudentId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Skills (comma separated)</label>
+                    <input type="text" id="editSkills">
+                </div>
+                <div class="form-group">
+                    <label>Add New Skill</label>
+                    <input type="text" id="newSkill" placeholder="Enter skill to add">
+                </div>
+                <button type="submit" class="btn-primary">Update Student</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://skillstudent.onrender.com/api';
+        let currentTeacher = null;
+        let token = null;
+
+        // Check authentication
+        window.addEventListener('load', () => {
+            token = localStorage.getItem('token');
+            currentTeacher = JSON.parse(localStorage.getItem('teacher'));
+            
+            if (!token || !currentTeacher) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            loadTeacherProfile();
+            loadDashboardData();
+        });
+
+        function loadTeacherProfile() {
+            document.getElementById('teacherName').textContent = currentTeacher.name;
+            document.getElementById('teacherEmail').textContent = currentTeacher.email;
+            document.getElementById('teacherDept').textContent = currentTeacher.department;
+            
+            // Set profile emoji based on name
+            const firstLetter = currentTeacher.name.charAt(0).toUpperCase();
+            document.getElementById('profilePic').textContent = firstLetter;
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(`${API_URL}/students`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const students = data.students;
+                    document.getElementById('totalStudents').textContent = students.length;
+                    
+                    // Calculate stats
+                    let totalSkills = 0;
+                    let totalProjects = 0;
+                    let totalAchievements = 0;
+                    
+                    students.forEach(s => {
+                        totalSkills += s.skills?.length || 0;
+                        totalProjects += s.projects?.length || 0;
+                        totalAchievements += s.achievements?.length || 0;
+                    });
+                    
+                    document.getElementById('totalSkills').textContent = totalSkills;
+                    document.getElementById('totalProjects').textContent = totalProjects;
+                    document.getElementById('totalAchievements').textContent = totalAchievements;
+                    
+                    // Show recent 5 students
+                    const recentStudents = students.slice(0, 5);
+                    displayRecentStudents(recentStudents);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function displayRecentStudents(students) {
+            const tbody = document.getElementById('recentStudentsList');
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No students found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.rollNumber || '-'}</td>
+                    <td>${s.branch}</td>
+                    <td>${s.skills?.slice(0, 2).map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                    <td class="action-buttons">
+                        <button class="btn-secondary" onclick="editStudent('${s._id}')">Edit</button>
+                        <button class="btn-danger" onclick="deleteStudent('${s._id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadAllStudents() {
+            try {
+                const response = await fetch(`${API_URL}/students`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tbody = document.getElementById('allStudentsList');
+                    if (data.students.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6">No students found</td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = data.students.map(s => `
+                        <tr>
+                            <td>${s.name}</td>
+                            <td>${s.rollNumber || '-'}</td>
+                            <td>${s.branch}</td>
+                            <td>${s.semester || '-'}</td>
+                            <td>${s.skills?.slice(0, 2).map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                            <td class="action-buttons">
+                                <button class="btn-secondary" onclick="editStudent('${s._id}')">Edit</button>
+                                <button class="btn-danger" onclick="deleteStudent('${s._id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        // Add Student
+        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const skills = document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s);
+            
+            const studentData = {
+                name: document.getElementById('studentName').value,
+                email: document.getElementById('studentEmail').value,
+                rollNumber: document.getElementById('rollNumber').value,
+                branch: document.getElementById('branch').value,
+                semester: parseInt(document.getElementById('semester').value) || 1,
+                section: document.getElementById('section').value,
+                skills: skills,
+                cgpa: parseFloat(document.getElementById('cgpa').value) || 0
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/students/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(studentData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('addStudentMessage', '✅ Student added successfully!', 'success');
+                    document.getElementById('addStudentForm').reset();
+                    loadDashboardData();
+                    loadAllStudents();
+                } else {
+                    showMessage('addStudentMessage', `❌ ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('addStudentMessage', '❌ Error adding student', 'error');
+            }
+        });
+
+        // Edit Student
+        async function editStudent(id) {
+            try {
+                const response = await fetch(`${API_URL}/students/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const student = data.student;
+                    document.getElementById('editStudentId').value = id;
+                    document.getElementById('editName').value = student.name;
+                    document.getElementById('editEmail').value = student.email;
+                    document.getElementById('editSkills').value = student.skills?.join(', ') || '';
+                    document.getElementById('editModal').classList.remove('hidden');
+                }
+            } catch (error) {
+                showMessage('allStudentsMessage', 'Error loading student', 'error');
+            }
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editStudentId').value;
+            const newSkill = document.getElementById('newSkill').value.trim();
+            
+            let updateData = {
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value
+            };
+            
+            const skillsInput = document.getElementById('editSkills').value;
+            if (skillsInput) {
+                updateData.skills = skillsInput.split(',').map(s => s.trim());
+            }
+            
+            try {
+                // Update student info
+                let response = await fetch(`${API_URL}/students/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                // Add new skill if provided
+                if (newSkill) {
+                    response = await fetch(`${API_URL}/students/${id}/skills`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ skill: newSkill })
+                    });
+                }
+                
+                closeModal();
+                loadDashboardData();
+                loadAllStudents();
+                showMessage('allStudentsMessage', '✅ Student updated successfully!', 'success');
+            } catch (error) {
+                showMessage('allStudentsMessage', 'Error updating student', 'error');
+            }
+        });
+
+        // Delete Student
+        async function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                try {
+                    const response = await fetch(`${API_URL}/students/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        loadDashboardData();
+                        loadAllStudents();
+                        showMessage('allStudentsMessage', '✅ Student deleted successfully!', 'success');
+                    }
+                } catch (error) {
+                    showMessage('allStudentsMessage', 'Error deleting student', 'error');
+                }
+            }
+        }
+
+        // Search by Skill
+        async function searchBySkill() {
+            const skill = document.getElementById('searchSkill').value.trim();
+            if (!skill) {
+                showMessage('searchResults', 'Please enter a skill to search', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/students/search/${encodeURIComponent(skill)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                const resultsDiv = document.getElementById('searchResults');
+                if (data.success && data.students.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <h4>Found ${data.count} student(s) with skill "${skill}":</h4>
+                        <div class="students-table-container">
+                            <table class="students-table">
+                                <thead><tr><th>Name</th><th>Roll No</th><th>Branch</th><th>Skills</th></tr></thead>
+                                <tbody>
+                                    ${data.students.map(s => `
+                                        <tr>
+                                            <td>${s.name}</td>
+                                            <td>${s.rollNumber || '-'}</td>
+                                            <td>${s.branch}</td>
+                                            <td>${s.skills?.map(skill => `<span class="skill-badge">${skill}</span>`).join('') || '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<p class="message error">No students found with skill "${skill}"</p>`;
+                }
+            } catch (error) {
+                document.getElementById('searchResults').innerHTML = `<p class="message error">Error searching students</p>`;
+            }
+        }
+
+        // UI Functions
+        function showPanel(panel) {
+            document.getElementById('dashboardPanel').classList.add('hidden');
+            document.getElementById('addStudentPanel').classList.add('hidden');
+            document.getElementById('allStudentsPanel').classList.add('hidden');
+            document.getElementById('searchStudentPanel').classList.add('hidden');
+            
+            document.getElementById(`${panel}Panel`).classList.remove('hidden');
+            
+            // Update active nav button
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.nav-btn').classList.add('active');
+            
+            if (panel === 'allStudents') {
+                loadAllStudents();
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editForm').reset();
+        }
+        
+        function showMessage(elementId, message, type) {
+            const msgDiv = document.getElementById(elementId);
+            if (msgDiv) {
+                msgDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+                setTimeout(() => msgDiv.innerHTML = '', 3000);
+            } else {
+                alert(message);
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('teacher');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

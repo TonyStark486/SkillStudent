@@ -1072,7 +1072,7 @@ async function handleLogin(event) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('teacher', JSON.stringify(data.teacher));
             setTimeout(() => {
-                window.location.href = 'teacher-dashboard.html';
+                window.location.href = 'dashboard/teacher.html';
             }, 1500);
         } else {
             showMessage('loginMessage', `❌ ${data.message}`, 'error');
