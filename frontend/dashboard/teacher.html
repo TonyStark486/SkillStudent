@@ -361,7 +361,7 @@
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         @keyframes slideIn {
@@ -376,7 +376,7 @@
         }
 
         /* Modal - Fixed */
-        .modal {
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -386,10 +386,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 10000;
         }
 
-        .modal-content {
+        .modal-container {
             background: white;
             border-radius: 20px;
             padding: 2rem;
@@ -399,6 +399,7 @@
             overflow-y: auto;
             position: relative;
             animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
         }
 
         @keyframes modalSlideIn {
@@ -412,9 +413,10 @@
             }
         }
 
-        .modal-content h3 {
+        .modal-container h3 {
             margin-bottom: 1.5rem;
             color: #1a202c;
+            font-size: 1.5rem;
         }
 
         .modal-buttons {
@@ -618,35 +620,8 @@
         </div>
     </div>
 
-    <!-- Edit Modal - Fixed -->
-    <div id="editModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>✏️ Edit Student</h3>
-            <form id="editForm">
-                <input type="hidden" id="editStudentId">
-                <div class="form-group">
-                    <label>Name *</label>
-                    <input type="text" id="editName" required>
-                </div>
-                <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" id="editEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>Skills (comma separated)</label>
-                    <input type="text" id="editSkills" placeholder="Python, Java, MongoDB">
-                </div>
-                <div class="form-group">
-                    <label>Add New Skill</label>
-                    <input type="text" id="newSkill" placeholder="Enter skill to add">
-                </div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn-primary">💾 Update Student</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Modal will be dynamically inserted here -->
+    <div id="modalRoot"></div>
 
     <script>
         const API_URL = 'https://skillstudent.onrender.com/api';
@@ -767,37 +742,75 @@
         }
 
         // Open Edit Modal - Fixed
-        async function openEditModal(id) {
-            try {
-                const response = await fetch(`${API_URL}/students/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
-                
+        function openEditModal(id) {
+            // Fetch student data
+            fetch(`${API_URL}/students/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
                 if (data.success) {
                     const student = data.student;
-                    document.getElementById('editStudentId').value = id;
-                    document.getElementById('editName').value = student.name;
-                    document.getElementById('editEmail').value = student.email;
-                    document.getElementById('editSkills').value = student.skills?.join(', ') || '';
-                    document.getElementById('newSkill').value = '';
-                    document.getElementById('editModal').classList.remove('hidden');
+                    showModal(id, student);
                 }
-            } catch (error) {
+            })
+            .catch(error => {
                 showMessage('allStudentsMessage', 'Error loading student data', 'error');
-            }
+            });
+        }
+
+        // Show Modal Function
+        function showModal(id, student) {
+            const modalHTML = `
+                <div class="modal-overlay" id="editModalOverlay">
+                    <div class="modal-container">
+                        <h3>✏️ Edit Student</h3>
+                        <form id="editStudentForm">
+                            <input type="hidden" id="editStudentId" value="${id}">
+                            <div class="form-group">
+                                <label>Name *</label>
+                                <input type="text" id="editName" value="${student.name.replace(/"/g, '&quot;')}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="editEmail" value="${student.email}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Skills (comma separated)</label>
+                                <input type="text" id="editSkills" value="${student.skills?.join(', ') || ''}" placeholder="Python, Java, MongoDB">
+                            </div>
+                            <div class="form-group">
+                                <label>Add New Skill</label>
+                                <input type="text" id="newSkill" placeholder="Enter skill to add">
+                            </div>
+                            <div class="modal-buttons">
+                                <button type="submit" class="btn-primary">💾 Update Student</button>
+                                <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalRoot').innerHTML = modalHTML;
+            
+            // Add event listener to the form
+            document.getElementById('editStudentForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateStudent(id);
+            });
         }
 
         // Close Modal - Fixed
         function closeModal() {
-            document.getElementById('editModal').classList.add('hidden');
-            document.getElementById('editForm').reset();
+            const overlay = document.getElementById('editModalOverlay');
+            if (overlay) {
+                overlay.remove();
+            }
         }
 
-        // Update Student - Fixed
-        document.getElementById('editForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('editStudentId').value;
+        // Update Student
+        async function updateStudent(id) {
             const newSkill = document.getElementById('newSkill').value.trim();
             
             let updateData = {
@@ -840,7 +853,7 @@
             } catch (error) {
                 showMessage('allStudentsMessage', 'Error updating student', 'error');
             }
-        });
+        }
 
         // Add Student
         document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
@@ -958,8 +971,12 @@
             document.getElementById(`${panel}Panel`).classList.remove('hidden');
             
             // Update active nav button
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.closest('.nav-btn').classList.add('active');
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                const clickedBtn = event.target.closest('.nav-btn');
+                if (clickedBtn) clickedBtn.classList.add('active');
+            }
             
             if (panel === 'allStudents') {
                 loadAllStudents();
@@ -987,12 +1004,12 @@
         }
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target === modal) {
+        document.addEventListener('click', function(event) {
+            const overlay = document.getElementById('editModalOverlay');
+            if (event.target === overlay) {
                 closeModal();
             }
-        }
+        });
     </script>
 </body>
 </html>
